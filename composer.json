@@ -1,0 +1,37 @@
+{
+    "name": "luoluolzb/di",
+    "description": "luoluolzb's Dependency Injection Container",
+    "keywords": [
+        "di",
+        "container"
+    ],
+    "homepage": "https://github.com/luoluolzb/DI",
+    "authors": [
+        {
+            "name": "luoluolzb",
+            "email": "luoluolzb@163.com"
+        }
+    ],
+    "license": "MIT",
+    "require": {
+        "php": ">=7.2",
+        "psr/container": "^1.0"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.4",
+        "phpstan/phpstan": "^0.11.12",
+        "phpunit/phpunit": "^8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "luoluolzb\\di\\": "src/",
+            "luoluolzb\\di\\tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "phpunit": "vendor\\bin\\phpunit tests",
+        "phpcs": "vendor\\bin\\phpcs -sw --standard=PSR2 --colors src",
+        "phpcbf": "vendor\\bin\\phpcbf -sw --standard=PSR2 --colors src",
+        "phpstan": "vendor\\bin\\phpstan analyse --level 7 src"
+    }
+}

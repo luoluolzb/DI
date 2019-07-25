@@ -1,10 +1,7 @@
 {
     "name": "luoluolzb/di",
     "description": "luoluolzb's Dependency Injection Container",
-    "keywords": [
-        "di",
-        "container"
-    ],
+    "keywords": ["di", "container", "psr-11"],
     "homepage": "https://github.com/luoluolzb/DI",
     "authors": [
         {

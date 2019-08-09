@@ -4,7 +4,7 @@ A simple dependency injection container for psr-11.
 
 
 ## 安装
-使用 `composer` 进行安装：
+使用 `composer` 安装：
 ```
 composer require luoluolzb/di
 ```

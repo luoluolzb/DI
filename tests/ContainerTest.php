@@ -159,7 +159,7 @@ class ContainerTest extends TestCase
         $absService = $container->get('absService');
         $this->assertTrue(123 == $absService(123));
         $this->assertTrue(2.5 == $absService(-2.5));
-//        $this->expected($absService('world'));
+        // $this->expected($absService('world'));
     }
 
     /**
@@ -192,5 +192,25 @@ class ContainerTest extends TestCase
         $this->expectException(EntityNotFoundException::class);
         $good = $container['good'];
     }
-}
 
+    /**
+     * 测试工厂创建模式
+     */
+    public function testFactory()
+    {
+        $container = new Container();
+        // 单一模式注入
+        $container->set('C', function (Container $c) {
+            return new ClassC();
+        });
+        $c = $container->get('C');
+        $this->assertTrue($c === $container->get('C'));
+        
+        // 工厂模式注入
+        $container->factory('CC', function (Container $c) {
+            return new ClassC();
+        });
+        $cc = $container->get('CC');
+        $this->assertFalse($cc === $container->get('CC'));
+    }
+}

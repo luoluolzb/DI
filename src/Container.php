@@ -26,11 +26,26 @@ class Container implements ContainerInterface, \ArrayAccess, \Countable
     protected $entities;
 
     /**
+     * 实体缓存值
+     *
+     * @var mixed
+     */
+    protected $values;
+
+    /**
+     * 实体获取是否为创建模式
+     *
+     * @var mixed
+     */
+    protected $isFactory;
+
+    /**
      * 创建一个容器
      *
-     * @param array|null $entities 初始注入的实体列表[id => entity]
+     * @param array|null $entities  初始注入的实体列表[id => entity]
+     * @param array      $isFactory 哪些实体需要使用工厂创建模式 [id => true]
      */
-    public function __construct(array $entities = null)
+    public function __construct(array $entities = null, array $isFactory = [])
     {
         $this->entities = [];
         if ($entities) {
@@ -38,17 +53,37 @@ class Container implements ContainerInterface, \ArrayAccess, \Countable
                 $this->set((string)$id, $entry);
             }
         }
+        $this->values = [];
+        $this->isFactory = $isFactory;
     }
 
     /**
      * 向容器中注入一个实体，实体可以是任何类型
+     * 默认每次取出都为同一实例，想要每次取出都重新创建，使用 factory 方法
      *
-     * @param string $id    设置的实体标识符，便于之后取出
+     * @param string $id    实体标识符
      * @param mixed  $entry 要注入的实体
+     *
+     * @return void
      */
-    public function set(string $id, $entry): void
+    public function set($id, $entry): void
     {
         $this->entities[$id] = $entry;
+    }
+
+    /**
+     * 使用创建模式向容器中注入一个实体，实体可以是任何类型
+     * 每次取出时都会重新创建实例
+     *
+     * @param string $id    实体标识符
+     * @param mixed  $entry 要注入的实体
+     *
+     * @return void
+     */
+    public function factory($id, $entry): void
+    {
+        $this->entities[$id] = $entry;
+        $this->isFactory[$id] = true;
     }
 
     /**
@@ -58,10 +93,16 @@ class Container implements ContainerInterface, \ArrayAccess, \Countable
      *
      * @return void
      */
-    public function delete(string $id): void
+    public function delete($id): void
     {
         if ($this->has($id)) {
             unset($this->entities[$id]);
+            if (isset($this->values[$id])) {
+                unset($this->values[$id]);
+            }
+            if (isset($this->isFactory[$id])) {
+                unset($this->isFactory[$id]);
+            }
         }
     }
 
@@ -86,7 +127,15 @@ class Container implements ContainerInterface, \ArrayAccess, \Countable
         // 如果是可调用的
         // 将此容器实例传入第一个参数
         if (is_callable($entity)) {
-            return $entity($this);
+            if (isset($this->isFactory[$id]) && $this->isFactory[$id]) { // 工厂模式
+                return $entity($this);
+            } else { // 单一实例模式
+                if (isset($this->values[$id])) {
+                    return $this->values[$id];
+                } else {
+                    return $this->values[$id] = $entity($this);
+                }
+            }
         }
 
         // 其他类型直接返回

@@ -85,6 +85,35 @@ $container = new Container([
 ```
 
 
+### 工厂方式注入实体
+使用 `set` 或者数组式注入实体时，每次取出的都为同一对象实例，想要每次取出时都重新创建实例使用 `factory` 方法：
+```php
+// 注入匿名函数
+$container->factory('myClass', function($c) {
+    return MyClass();
+});
+```
+
+如果是通过构造函数一次注入了多个实体，想要使用工厂方式需提供第二个参数指定实体：
+```php
+$container = new Container([
+    'logger' => function($c) {
+        $logger = new Monolog\Logger;
+        $logger->pushHandler(new Monolog\Handler\StreamHandler('app.log', Logger::WARNING));
+        return $logger;
+    },
+
+    'myClass' => function($c) {
+        return MyClass();
+    },
+], [
+    'logger' => true,
+]);
+```
+
+这样就将 `myClass` 指定为工厂创建模式，其他的仍然为单一实例模式。
+
+
 ### 获取实体
 使用`get($id)`方法从容器中获取一个实体：
 ```php
